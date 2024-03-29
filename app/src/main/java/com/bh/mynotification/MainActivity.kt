@@ -12,12 +12,8 @@ import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.View
 import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Spinner
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -26,15 +22,24 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.widget.doOnTextChanged
+import androidx.lifecycle.ViewModelProvider
 import com.bh.mynotification.databinding.ActivityMainBinding
+import com.google.gson.Gson
 import kotlin.random.Random
 
 
 class MainActivity : AppCompatActivity() {
+
+    companion object {
+        private const val REQUEST_CODE_POST_NOTIFICATIONS = 1
+        private const val CHANNEL_ID = "Event Notification"
+        private const val CHANNEL_NAME = "Event Notification"
+    }
+
     // Declare a binding variable
     private lateinit var binding: ActivityMainBinding
-
-    private lateinit var importanceAdapter: ArrayAdapter<CharSequence>
+    private lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +48,11 @@ class MainActivity : AppCompatActivity() {
         // Initialize the binding
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Initialize ViewModel
+        viewModel = ViewModelProvider(this)[MainViewModel::class.java]
+
+        viewModel.loadPreferences(this)
 
         // Replace findViewById with view binding
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
@@ -57,38 +67,97 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        setupUI()
+        observeViewModel()
+    }
+
+    private fun setupUI() {
+        // Setup the UI components
         binding.btnShowNotification.setOnClickListener {
             showEventNotification(this, "calendar_id", "event_id")
-        }
-
-        binding.btnShowNotificationPostDelay.setOnClickListener {
-            Handler(Looper.getMainLooper()).postDelayed({
-                showEventNotification(this, "calendar_id", "event_id")
-            }, 5000)
+            viewModel.savePreferences(this)
         }
 
         binding.btnCheckMeeting.setOnClickListener {
             startActivity(Intent(this, UserMeetingEditorActivity::class.java))
         }
 
-        importanceAdapter = ArrayAdapter.createFromResource(
-            this,
-            R.array.notification_importance,
-            android.R.layout.simple_spinner_item
-        )
-        importanceAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        binding.importanceSpinner.adapter = importanceAdapter;
+        binding.etTitle.doOnTextChanged { text, start, before, count ->
+            viewModel.title = text.toString()
+        }
 
+        binding.etContent.doOnTextChanged { text, start, before, count ->
+            viewModel.content = text.toString()
+        }
+
+        // Setup listeners and adapters here
+        setupSpinners()
+
+    }
+
+    private fun observeViewModel() {
+        // Observe ViewModel LiveData and react to changes
+
+
+    }
+
+    private fun findPositionForValue(elementId: Int, value: Int): Int {
+
+        when (elementId) {
+            R.id.importance_spinner -> {
+                val values =
+                    resources.getIntArray(R.array.notification_importance_values)
+                return values.indexOf(value)
+            }
+        }
+
+        return 0
+    }
+
+    private fun setupSpinners() {
+        // Setup the spinners with the appropriate data
+
+        binding.importanceSpinner.setSelection(
+            resources.getIntArray(R.array.notification_importance_values)
+                .indexOf(
+                    viewModel.selectedImportance
+                )
+        )
+        binding.importanceSpinner.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>, view: View, position: Int, id: Long
+                ) {
+                    val values =
+                        resources.getIntArray(R.array.notification_importance_values)
+                    val selectedImportance = values[position]
+                    viewModel.selectedImportance = selectedImportance
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>) {}
+            }
+
+        binding.categorySpinner.setSelection(
+            resources.getStringArray(R.array.notification_categories_values)
+                .indexOf(
+                    viewModel.selectedCategory
+                )
+        )
+        binding.categorySpinner.setSelection(
+            resources.getStringArray(R.array.notification_categories_values)
+                .indexOf(
+                    viewModel.selectedCategory
+                )
+        )
         binding.categorySpinner.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(
                     parent: AdapterView<*>, view: View, position: Int, id: Long
                 ) {
-                    val selectedCategory =
-                        parent.getItemAtPosition(position).toString()
-                    // Handle the selected category
-                    //Toast.makeText(this@MainActivity, "Selected: $selectedCategory", Toast.LENGTH_SHORT).show()
-                    this@MainActivity.selectedCategory = selectedCategory
+                    val values =
+                        resources.getStringArray(R.array.notification_categories_values)
+                    val selectedCategory = values[position]
+                    viewModel.selectedCategory = selectedCategory
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>) {
@@ -96,67 +165,65 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-        val prioritySpinner: Spinner =
-            findViewById(R.id.priority_spinner) // Assuming you have defined this Spinner in your XML
-        val priorityAdapter: ArrayAdapter<CharSequence> =
-            ArrayAdapter.createFromResource(
-                this,
-                R.array.notification_priorities,
-                android.R.layout.simple_spinner_item
-            )
-        priorityAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        prioritySpinner.adapter = priorityAdapter
-    }
+        binding.prioritySpinner.setSelection(
+            resources.getIntArray(R.array.notification_priorities_values)
+                .indexOf(
+                    viewModel.selectedPriority
+                )
+        )
+        binding.prioritySpinner.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>, view: View, position: Int, id: Long
+                ) {
+                    val values =
+                        resources.getIntArray(R.array.notification_priorities_values)
+                    val selectedPriority = values[position]
+                    viewModel.selectedPriority = selectedPriority
+                }
 
-    private fun getPriority(): Int {
-        return when (binding.prioritySpinner.selectedItemPosition) {
-            0 -> NotificationCompat.PRIORITY_DEFAULT
-            1 -> NotificationCompat.PRIORITY_LOW
-            2 -> NotificationCompat.PRIORITY_MIN
-            3 -> NotificationCompat.PRIORITY_HIGH
-            4 -> NotificationCompat.PRIORITY_MAX
-            else -> NotificationCompat.PRIORITY_DEFAULT
-        }
-    }
+                override fun onNothingSelected(parent: AdapterView<*>) {
+                    // Another interface callback
+                }
+            }
 
-    private var selectedCategory: String = ""
+        binding.badgeIconSpinner.setSelection(
+            resources.getIntArray(R.array.notification_badge_icons_values)
+                .indexOf(
+                    viewModel.selectedBadgeIconType
+                )
+        )
+        binding.badgeIconSpinner.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>, view: View, position: Int, id: Long
+                ) {
+                    val values =
+                        resources.getIntArray(R.array.notification_badge_icons_values)
+                    val selectedBadgeIconType = values[position]
+                    viewModel.selectedBadgeIconType = selectedBadgeIconType
+                }
 
-    private fun getImportance(): Int {
-        return when (binding.importanceSpinner.selectedItemPosition) {
-            0 -> NotificationManager.IMPORTANCE_NONE
-            1 -> NotificationManager.IMPORTANCE_MIN
-            2 -> NotificationManager.IMPORTANCE_LOW
-            3 -> NotificationManager.IMPORTANCE_DEFAULT
-            4 -> NotificationManager.IMPORTANCE_HIGH
-            5 -> NotificationManager.IMPORTANCE_MAX
-            else -> NotificationManager.IMPORTANCE_DEFAULT
-        }
-    }
-
-    private fun getBadgeIconType(): Int {
-        return when (binding.badgeIconSpinner.selectedItemPosition) {
-            0 -> NotificationCompat.BADGE_ICON_NONE
-            1 -> NotificationCompat.BADGE_ICON_SMALL
-            2 -> NotificationCompat.BADGE_ICON_LARGE
-            else -> NotificationCompat.BADGE_ICON_SMALL
-        }
+                override fun onNothingSelected(parent: AdapterView<*>) {
+                    // Another interface callback
+                }
+            }
     }
 
     private fun showEventNotification(
         context: Context, cid: String, eid: String
     ) {
-        val channelId = "event_notification_channel"
         val notificationId = Random.nextInt(0, 1000)
 
         // Create a notification channel for Android O and above
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "Event Notification"
             val descriptionText = "Notifications for specific events"
-            val importance = getImportance()
-            val channel =
-                NotificationChannel(channelId, name, importance).apply {
-                    description = descriptionText
-                }
+            val importance = viewModel.selectedImportance
+            val channel = NotificationChannel(
+                CHANNEL_ID, CHANNEL_NAME, importance
+            ).apply {
+                description = descriptionText
+            }
             // Register the channel with the system
             val notificationManager: NotificationManager =
                 context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -184,11 +251,12 @@ class MainActivity : AppCompatActivity() {
 
         val title = binding.etTitle.text.toString()
         val content = binding.etContent.text.toString()
-        val category = selectedCategory
-        val priority = getPriority()
-        val badgeIconType = getBadgeIconType()
+        val category = viewModel.selectedCategory
+        val priority = viewModel.selectedPriority
+        val badgeIconType = viewModel.selectedBadgeIconType
 
-        val builder = NotificationCompat.Builder(context, channelId)
+        NotificationCompat.CATEGORY_EVENT
+        val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
             .setVibrate(longArrayOf(0, 100)).setSound(alarmSound)
             .setStyle(NotificationCompat.InboxStyle())
@@ -213,6 +281,27 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    override fun onResume() {
+        super.onResume()
+
+        val areNotificationsEnabled =
+            NotificationManagerCompat.from(this).areNotificationsEnabled()
+        binding.switchShowNotification.isChecked = areNotificationsEnabled
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationManager: NotificationManager =
+                getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            val channel: NotificationChannel? =
+                notificationManager.getNotificationChannel(CHANNEL_ID)
+            if (channel != null) {
+                val isChannelEnabled =
+                    channel.importance != NotificationManager.IMPORTANCE_NONE
+                // IMPORTANCE_NONE means the channel is blocked, thus no notifications will pop on the screen.
+                binding.switchIsChannelEnabled.isChecked = isChannelEnabled
+            }
+        }
+    }
+
     // Override onRequestPermissionsResult to handle permission result
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<out String>, grantResults: IntArray
@@ -235,10 +324,5 @@ class MainActivity : AppCompatActivity() {
                 // Optionally, inform the user that the notification feature requires permission.
             }
         }
-    }
-
-    // Ensure you define REQUEST_CODE_POST_NOTIFICATIONS as a constant
-    companion object {
-        private const val REQUEST_CODE_POST_NOTIFICATIONS = 1
     }
 }
