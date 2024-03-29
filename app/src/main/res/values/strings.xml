@@ -1,0 +1,68 @@
+<resources>
+    <string name="app_name">MyNotification</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">Meeting Event Details</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="lorem_ipsum">
+        ...
+    </string>
+    <string name="check_meeting">Check Meeting</string>
+    <string name="show_notification_after_5_seconds">Show Notification after 5 seconds</string>
+    <string name="show_notification">Show Notification</string>
+
+    <string-array name="notification_importance">
+        <item>IMPORTANCE_NONE</item>
+        <item>IMPORTANCE_MIN</item>
+        <item>IMPORTANCE_LOW</item>
+        <item>IMPORTANCE_DEFAULT</item>
+        <item>IMPORTANCE_HIGH</item>
+        <item>IMPORTANCE_MAX</item>
+    </string-array>
+    <string-array name="notification_categories">
+        <item>alarm</item>
+        <item>call</item>
+        <item>email</item>
+        <item>err</item>
+        <item>event</item>
+        <item>location_sharing</item>
+        <item>msg</item>
+        <item>missed_call</item>
+        <item>navigation</item>
+        <item>progress</item>
+        <item>promo</item>
+        <item>recommendation</item>
+        <item>reminder</item>
+        <item>service</item>
+        <item>social</item>
+        <item>status</item>
+        <item>stopwatch</item>
+        <item>sys</item>
+        <item>transport</item>
+        <item>workout</item>
+    </string-array>
+
+    <string-array name="notification_priorities">
+        <item>Default (0)</item>
+        <item>Low (-1)</item>
+        <item>Min (-2)</item>
+        <item>High (1)</item>
+        <item>Max (2)</item>
+    </string-array>
+    <integer-array name="notification_priorities_values">
+        <item>0</item>
+        <item>-1</item>
+        <item>-2</item>
+        <item>1</item>
+        <item>2</item>
+    </integer-array>
+
+    <string-array name="notification_badge_icons">
+        <item>BADGE_ICON_NONE</item>
+        <item>BADGE_ICON_SMALL</item>
+        <item>BADGE_ICON_LARGE</item>
+    </string-array>
+
+</resources>
