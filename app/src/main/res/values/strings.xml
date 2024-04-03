@@ -6,13 +6,20 @@
     <string name="next">Next</string>
     <string name="previous">Previous</string>
 
-    <string name="lorem_ipsum">
-        ...
-    </string>
     <string name="check_meeting">Check Meeting</string>
     <string name="show_notification_after_5_seconds">Show Notification after 5 seconds</string>
     <string name="show_notification">Show Notification</string>
     <string name="are_notifications_enabled">areNotificationsEnabled</string>
+    <string name="category">Category</string>
+    <string name="priority">Priority</string>
+    <string name="badge_icon_type">Badge Icon Type</string>
+    <string name="delay_time">Delay Time</string>
+    <string name="second_s">second(s)</string>
+    <string name="ischannelenabled">isChannelEnabled</string>
+    <string name="title">Title</string>
+    <string name="message">Message</string>
+    <string name="content">Content</string>
+    <string name="importance">Importance</string>
 
     <string-array name="notification_importance">
         <item>IMPORTANCE_NONE</item>

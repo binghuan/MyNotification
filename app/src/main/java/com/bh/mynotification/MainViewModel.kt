@@ -6,6 +6,7 @@ import androidx.core.app.NotificationCompat
 import androidx.lifecycle.ViewModel
 
 class MainViewModel : ViewModel() {
+    var delayTime: Int = 0
     var content: String = ""
     var title: String = ""
     var selectedBadgeIconType: Int = NotificationCompat.BADGE_ICON_NONE
@@ -21,6 +22,7 @@ class MainViewModel : ViewModel() {
             putInt("SelectedPriority", selectedPriority)
             putInt("SelectedImportance", selectedImportance)
             putString("SelectedCategory", selectedCategory)
+            putInt("DelayTime", delayTime)
             apply()
         }
     }
@@ -32,6 +34,7 @@ class MainViewModel : ViewModel() {
         selectedPriority = sharedPref.getInt("SelectedPriority", 0)
         title = sharedPref.getString("Title", "") ?: ""
         content = sharedPref.getString("Content", "") ?: ""
+        delayTime = sharedPref.getInt("DelayTime", 0)
         selectedBadgeIconType =
             sharedPref.getInt("SelectedBadgeIconType", NotificationCompat.BADGE_ICON_NONE)
     }

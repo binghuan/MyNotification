@@ -50,7 +50,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Title:" />
+                    android:text="@string/title" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
@@ -61,7 +61,7 @@
                         android:id="@+id/et_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Title" />
+                        android:text="@string/title" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -72,7 +72,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Message:" />
+                    android:text="@string/content" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
@@ -83,7 +83,7 @@
                         android:id="@+id/et_content"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Content" />
+                        android:text="@string/content" />
                 </com.google.android.material.textfield.TextInputLayout>
             </TableRow>
 
@@ -92,7 +92,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Importance:" />
+                    android:text="@string/importance" />
 
                 <Spinner
                     android:id="@+id/importance_spinner"
@@ -106,7 +106,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Category:" />
+                    android:text="@string/category" />
 
                 <Spinner
                     android:id="@+id/category_spinner"
@@ -120,7 +120,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Priority:" />
+                    android:text="@string/priority" />
 
                 <Spinner
                     android:id="@+id/priority_spinner"
@@ -134,7 +134,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Badge Icon Type:" />
+                    android:text="@string/badge_icon_type" />
 
                 <Spinner
                     android:id="@+id/badge_icon_spinner"
@@ -148,7 +148,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Delay Time:" />
+                    android:text="@string/delay_time" />
 
                 <EditText
                     android:id="@+id/et_delay_time"
@@ -160,7 +160,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="second(s)" />
+                    android:text="@string/second_s" />
             </TableRow>
 
         </TableLayout>
@@ -177,9 +177,23 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:enabled="false"
-            android:text="isChannelEnabled" />
-
+            android:text="@string/ischannelenabled" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_notification_count_down"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="70dp"
+        android:textAlignment="center"
+        android:textColor="@android:color/holo_red_light"
+        android:textSize="96sp"
+        android:textStyle="bold"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="0" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btn_show_notification"

@@ -12,6 +12,10 @@ import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.CountDownTimer
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.Toast
@@ -22,6 +26,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isGone
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
 import com.bh.mynotification.databinding.ActivityMainBinding
@@ -35,6 +40,7 @@ class MainActivity : AppCompatActivity() {
         private const val REQUEST_CODE_POST_NOTIFICATIONS = 1
         private const val CHANNEL_ID = "Event Notification"
         private const val CHANNEL_NAME = "Event Notification"
+        private const val TAG = "BH_MainActivity"
     }
 
     // Declare a binding variable
@@ -71,10 +77,35 @@ class MainActivity : AppCompatActivity() {
         observeViewModel()
     }
 
+    private fun startCountdownTimer(delayInSeconds: Long) {
+        val timer = object : CountDownTimer(delayInSeconds * 1000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                // 更新 UI 以显示剩余时间，例如更新一个 TextView。这是可选的。
+                val remainingTime = millisUntilFinished / 1000
+                Log.i(TAG, "Remaining time: $remainingTime")
+                binding.tvNotificationCountDown.text = remainingTime.toString()
+                binding.tvNotificationCountDown.isGone = false
+            }
+
+            override fun onFinish() {
+                // 倒计时结束时调用
+                showEventNotification(
+                    this@MainActivity, "calendar_id", "event_id"
+                )
+                binding.tvNotificationCountDown.isGone = true
+            }
+        }
+        timer.start()
+    }
+
     private fun setupUI() {
         // Setup the UI components
         binding.btnShowNotification.setOnClickListener {
-            showEventNotification(this, "calendar_id", "event_id")
+
+            val delayTime =
+                binding.etDelayTime.text.toString().toIntOrNull() ?: 0
+            startCountdownTimer(delayTime.toLong())
+
             viewModel.savePreferences(this)
         }
 
@@ -90,6 +121,12 @@ class MainActivity : AppCompatActivity() {
             viewModel.content = text.toString()
         }
 
+        binding.etDelayTime.setText(viewModel.delayTime.toString())
+        binding.etDelayTime.doOnTextChanged { text, start, before, count ->
+            val delayTime = text.toString().toIntOrNull() ?: 0
+            viewModel.delayTime = delayTime
+        }
+
         // Setup listeners and adapters here
         setupSpinners()
 
@@ -99,19 +136,6 @@ class MainActivity : AppCompatActivity() {
         // Observe ViewModel LiveData and react to changes
 
 
-    }
-
-    private fun findPositionForValue(elementId: Int, value: Int): Int {
-
-        when (elementId) {
-            R.id.importance_spinner -> {
-                val values =
-                    resources.getIntArray(R.array.notification_importance_values)
-                return values.indexOf(value)
-            }
-        }
-
-        return 0
     }
 
     private fun setupSpinners() {
