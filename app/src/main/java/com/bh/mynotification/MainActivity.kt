@@ -101,7 +101,6 @@ class MainActivity : AppCompatActivity() {
     private fun setupUI() {
         // Setup the UI components
         binding.btnShowNotification.setOnClickListener {
-
             val delayTime =
                 binding.etDelayTime.text.toString().toIntOrNull() ?: 0
             startCountdownTimer(delayTime.toLong())
@@ -113,10 +112,12 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, UserMeetingEditorActivity::class.java))
         }
 
+        binding.etTitle.setText(viewModel.title)
         binding.etTitle.doOnTextChanged { text, start, before, count ->
             viewModel.title = text.toString()
         }
 
+        binding.etContent.setText(viewModel.content)
         binding.etContent.doOnTextChanged { text, start, before, count ->
             viewModel.content = text.toString()
         }
@@ -125,6 +126,21 @@ class MainActivity : AppCompatActivity() {
         binding.etDelayTime.doOnTextChanged { text, start, before, count ->
             val delayTime = text.toString().toIntOrNull() ?: 0
             viewModel.delayTime = delayTime
+        }
+
+        binding.etAction1.setText(viewModel.action1)
+        binding.etAction1.doOnTextChanged { text, start, before, count ->
+            viewModel.action1 = text.toString()
+        }
+
+        binding.etAction2.setText(viewModel.action2)
+        binding.etAction2.doOnTextChanged { text, start, before, count ->
+            viewModel.action2 = text.toString()
+        }
+
+        binding.switchAutoCancel.isChecked = viewModel.autoCancel
+        binding.switchAutoCancel.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.autoCancel = isChecked
         }
 
         // Setup listeners and adapters here
@@ -278,6 +294,7 @@ class MainActivity : AppCompatActivity() {
         val category = viewModel.selectedCategory
         val priority = viewModel.selectedPriority
         val badgeIconType = viewModel.selectedBadgeIconType
+        val isAutoCancelEnabled = viewModel.autoCancel
 
         NotificationCompat.CATEGORY_EVENT
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
@@ -287,9 +304,17 @@ class MainActivity : AppCompatActivity() {
             .setDefaults(Notification.DEFAULT_SOUND).setCategory(category)
             .setContentTitle(title).setContentText(content)
             .setFullScreenIntent(pendingIntent, true)
-            .setContentIntent(pendingIntent).setAutoCancel(true)
+            .setContentIntent(pendingIntent)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setPriority(priority).setNumber(0).setBadgeIconType(badgeIconType)
+            .setAutoCancel(isAutoCancelEnabled)
+
+        if(viewModel.action1.isNotEmpty()) {
+            addActionButton(builder, viewModel.action1)
+        }
+        if(viewModel.action2.isNotEmpty()) {
+            addActionButton(builder, viewModel.action2)
+        }
 
         // Show the notification
         with(NotificationManagerCompat.from(context)) {
@@ -303,6 +328,20 @@ class MainActivity : AppCompatActivity() {
             notify(notificationId, builder.build())
         }
     }
+
+    private fun addActionButton(builder: NotificationCompat.Builder, action: String) {
+        val actionIntent = Intent(this, UserMeetingEditorActivity::class.java)
+        actionIntent.putExtra(UserMeetingEditorActivity.INTENT_EXTRA_ACTION_BUTTON_TEXT, action)
+        // 指定 FLAG_IMMUTABLE 标志
+        val pendingIntent = PendingIntent.getActivity(
+            this, action.hashCode(), actionIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val actionButton = NotificationCompat.Action.Builder(
+            0, action, pendingIntent
+        ).build()
+        builder.addAction(actionButton)
+    }
+
 
 
     override fun onResume() {

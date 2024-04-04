@@ -7,6 +7,7 @@ import com.bh.mynotification.databinding.ActivityUserMeetingEditorBinding
 class UserMeetingEditorActivity : AppCompatActivity() {
 
     companion object {
+        const val INTENT_EXTRA_ACTION_BUTTON_TEXT = "INTENT_EXTRA_ACTION_BUTTON_TEXT"
         const val INTENT_EXTRA_ENTRY_POINT = "INTENT_EXTRA_ENTRY_POINT"
         const val INTENT_EXTRA_EVENT_ID = "INTENT_EXTRA_MEETING_ID"
         const val INTENT_EXTRA_CALENDAR_ID = "INTENT_EXTRA_CALENDAR_ID"
@@ -28,5 +29,8 @@ class UserMeetingEditorActivity : AppCompatActivity() {
         val calendarId = intent.getStringExtra(INTENT_EXTRA_CALENDAR_ID)
         binding.valueEid.text = eid
         binding.valueCid.text = calendarId
+
+        val actionText = intent.getStringExtra(INTENT_EXTRA_ACTION_BUTTON_TEXT)
+        binding.valueAction.text = actionText
     }
 }

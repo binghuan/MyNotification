@@ -6,6 +6,9 @@ import androidx.core.app.NotificationCompat
 import androidx.lifecycle.ViewModel
 
 class MainViewModel : ViewModel() {
+    var autoCancel: Boolean = true
+    var action1: String = ""
+    var action2: String = ""
     var delayTime: Int = 0
     var content: String = ""
     var title: String = ""
@@ -15,7 +18,9 @@ class MainViewModel : ViewModel() {
     var selectedImportance: Int = NotificationManager.IMPORTANCE_DEFAULT
 
     fun savePreferences(context: Context) {
-        val sharedPref = context.getSharedPreferences("AppSettings", Context.MODE_PRIVATE) ?: return
+        val sharedPref =
+            context.getSharedPreferences("AppSettings", Context.MODE_PRIVATE)
+                ?: return
         with(sharedPref.edit()) {
             putString("Content", content)
             putString("Title", title)
@@ -23,19 +28,28 @@ class MainViewModel : ViewModel() {
             putInt("SelectedImportance", selectedImportance)
             putString("SelectedCategory", selectedCategory)
             putInt("DelayTime", delayTime)
+            putString("Action1", action1)
+            putString("Action2", action2)
+            putBoolean("AutoCancel", autoCancel)
             apply()
         }
     }
 
     fun loadPreferences(context: Context) {
-        val sharedPref = context.getSharedPreferences("AppSettings", Context.MODE_PRIVATE) ?: return
+        val sharedPref =
+            context.getSharedPreferences("AppSettings", Context.MODE_PRIVATE)
+                ?: return
         selectedImportance = sharedPref.getInt("SelectedImportance", 0)
         selectedCategory = sharedPref.getString("SelectedCategory", "") ?: ""
         selectedPriority = sharedPref.getInt("SelectedPriority", 0)
         title = sharedPref.getString("Title", "") ?: ""
         content = sharedPref.getString("Content", "") ?: ""
         delayTime = sharedPref.getInt("DelayTime", 0)
-        selectedBadgeIconType =
-            sharedPref.getInt("SelectedBadgeIconType", NotificationCompat.BADGE_ICON_NONE)
+        selectedBadgeIconType = sharedPref.getInt(
+            "SelectedBadgeIconType", NotificationCompat.BADGE_ICON_NONE
+        )
+        action1 = sharedPref.getString("Action1", "") ?: ""
+        action2 = sharedPref.getString("Action2", "") ?: ""
+        autoCancel = sharedPref.getBoolean("AutoCancel", true)
     }
 }
