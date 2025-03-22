@@ -13,8 +13,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
@@ -30,7 +28,6 @@ import androidx.core.view.isGone
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
 import com.bh.mynotification.databinding.ActivityMainBinding
-import com.google.gson.Gson
 import kotlin.random.Random
 
 
