@@ -18,6 +18,7 @@ class MainViewModel : ViewModel() {
     var selectedImportance: Int = NotificationManager.IMPORTANCE_DEFAULT
     var unreadMsgCount: Int = 0
         private set
+    var useFixedNotificationId: Boolean = true
 
     fun setUnreadMsgCount(value: String): Int {
         unreadMsgCount = value.toIntOrNull() ?: 0
@@ -39,6 +40,7 @@ class MainViewModel : ViewModel() {
             putString("Action2", action2)
             putBoolean("AutoCancel", autoCancel)
             putInt("unreadMsgCount", unreadMsgCount)
+            putBoolean("useFixedNotificationId", useFixedNotificationId)
             apply()
         }
     }
@@ -60,5 +62,6 @@ class MainViewModel : ViewModel() {
         action2 = sharedPref.getString("Action2", "") ?: ""
         autoCancel = sharedPref.getBoolean("AutoCancel", true)
         unreadMsgCount = sharedPref.getInt("unreadMsgCount", 0)
+        useFixedNotificationId = sharedPref.getBoolean("useFixedNotificationId", true)
     }
 }

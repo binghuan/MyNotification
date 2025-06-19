@@ -112,4 +112,6 @@
         <item>2</item>
     </integer-array>
 
+    <string name="use_fixed_notification_id">Use Fixed Notification ID (1001)</string>
+
 </resources>

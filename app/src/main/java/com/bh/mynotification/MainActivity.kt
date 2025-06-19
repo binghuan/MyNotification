@@ -97,13 +97,19 @@ class MainActivity : AppCompatActivity() {
     private fun setupUI() {
         // Setup the UI components
         binding.btnShowNotification.setOnClickListener {
-
             viewModel.setUnreadMsgCount(binding.etUnreadMsgCount.text.toString())
 
             val delayTime =
                 binding.etDelayTime.text.toString().toIntOrNull() ?: 0
             startCountdownTimer(delayTime.toLong())
 
+            viewModel.savePreferences(this)
+        }
+
+        binding.switchUseFixedNotificationId.isChecked =
+            viewModel.useFixedNotificationId
+        binding.switchUseFixedNotificationId.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.useFixedNotificationId = isChecked
             viewModel.savePreferences(this)
         }
 
@@ -255,7 +261,7 @@ class MainActivity : AppCompatActivity() {
                 ).show()
             } else {
                 // Solution 1
-//                setSamsungBadgeCount(this, badgeCount)
+//                setSamsungBadgeCount(this, unreadMsgCount)
 //                return@setOnClickListener
 
                 // Solution 2: Using NotificationBadge library
@@ -345,7 +351,11 @@ class MainActivity : AppCompatActivity() {
     private fun showEventNotification(
         context: Context, cid: String, eid: String
     ) {
-        val notificationId = Random.nextInt(0, 1000)
+        val notificationId = if (viewModel.useFixedNotificationId) {
+            1001 // 固定的 ID
+        } else {
+            Random.nextInt(0, 1000)
+        }
 
         // Create a notification channel for Android O and above
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -422,6 +432,12 @@ class MainActivity : AppCompatActivity() {
                 // Permission handling omitted for brevity
                 return
             }
+
+            Toast.makeText(
+                context,
+                "Showing notification with ID: $notificationId",
+                Toast.LENGTH_SHORT
+            ).show()
             notify(notificationId, builder.build())
         }
     }
