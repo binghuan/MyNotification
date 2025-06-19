@@ -237,6 +237,42 @@ class MainActivity : AppCompatActivity() {
                     // Another interface callback
                 }
             }
+
+        binding.btnSetBadge.setOnClickListener {
+            // Use NotificationBadge to set the badge count
+            val badgeCount = binding.etBadgeCount.text.toString().toIntOrNull() ?: 0
+            if (badgeCount < 0) {
+                Toast.makeText(this, "Badge count cannot be negative", Toast.LENGTH_SHORT).show()
+            } else {
+                // Solution 1
+//                setSamsungBadgeCount(this, badgeCount)
+//                return@setOnClickListener
+
+                // Solution 2: Using NotificationBadge library
+                val success = NotificationBadge(this).applyCount(badgeCount)
+                if (success) {
+                    Toast.makeText(this, "Badge set successfully", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "Failed to set badge. Your launcher may not support this feature.", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
+    private fun setSamsungBadgeCount(context: Context, badgeCount: Int) {
+        Log.i( TAG, "setSamsungBadgeCount badgeCount=$badgeCount")
+        val intent = Intent("android.intent.action.BADGE_COUNT_UPDATE")
+        intent.putExtra("badge_count", badgeCount)
+        intent.putExtra("badge_count_package_name", context.packageName)
+        intent.putExtra("badge_count_class_name", getLauncherClassName(context))
+        context.sendBroadcast(intent)
+    }
+    private fun getLauncherClassName(context: Context): String? {
+        val intent = Intent(Intent.ACTION_MAIN).apply {
+            addCategory(Intent.CATEGORY_LAUNCHER)
+        }
+        val resolveInfo = context.packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
+        return resolveInfo?.activityInfo?.name
     }
 
     override fun onResume() {

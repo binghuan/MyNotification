@@ -24,6 +24,7 @@
     <string name="action_button_2">Action Button 2</string>
     <string name="autocancel">autoCancel</string>
     <string name="set_badge">setBadge</string>
+    <string name="badge_count">Badge Count</string>
 
     <string-array name="notification_importance">
         <item>IMPORTANCE_NONE</item>
