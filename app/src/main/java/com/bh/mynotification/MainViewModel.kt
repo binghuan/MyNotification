@@ -16,6 +16,13 @@ class MainViewModel : ViewModel() {
     var selectedPriority: Int = NotificationCompat.PRIORITY_DEFAULT
     var selectedCategory: String = NotificationCompat.CATEGORY_EVENT
     var selectedImportance: Int = NotificationManager.IMPORTANCE_DEFAULT
+    var unreadMsgCount: Int = 0
+        private set
+
+    fun setUnreadMsgCount(value: String): Int {
+        unreadMsgCount = value.toIntOrNull() ?: 0
+        return unreadMsgCount
+    }
 
     fun savePreferences(context: Context) {
         val sharedPref =
@@ -31,6 +38,7 @@ class MainViewModel : ViewModel() {
             putString("Action1", action1)
             putString("Action2", action2)
             putBoolean("AutoCancel", autoCancel)
+            putInt("unreadMsgCount", unreadMsgCount)
             apply()
         }
     }
@@ -51,5 +59,6 @@ class MainViewModel : ViewModel() {
         action1 = sharedPref.getString("Action1", "") ?: ""
         action2 = sharedPref.getString("Action2", "") ?: ""
         autoCancel = sharedPref.getBoolean("AutoCancel", true)
+        unreadMsgCount = sharedPref.getInt("unreadMsgCount", 0)
     }
 }
