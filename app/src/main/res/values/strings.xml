@@ -23,6 +23,7 @@
     <string name="action_button_1">Action Button 1</string>
     <string name="action_button_2">Action Button 2</string>
     <string name="autocancel">autoCancel</string>
+    <string name="set_badge">setBadge</string>
 
     <string-array name="notification_importance">
         <item>IMPORTANCE_NONE</item>

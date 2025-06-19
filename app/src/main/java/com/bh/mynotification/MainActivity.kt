@@ -30,7 +30,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.bh.mynotification.databinding.ActivityMainBinding
 import kotlin.random.Random
 
-
 class MainActivity : AppCompatActivity() {
 
     companion object {
@@ -86,9 +85,6 @@ class MainActivity : AppCompatActivity() {
 
             override fun onFinish() {
                 // 倒计时结束时调用
-                showEventNotification(
-                    this@MainActivity, "calendar_id", "event_id"
-                )
                 binding.tvNotificationCountDown.isGone = true
             }
         }
@@ -103,10 +99,6 @@ class MainActivity : AppCompatActivity() {
             startCountdownTimer(delayTime.toLong())
 
             viewModel.savePreferences(this)
-        }
-
-        binding.btnCheckMeeting.setOnClickListener {
-            startActivity(Intent(this, UserMeetingEditorActivity::class.java))
         }
 
         binding.etTitle.setText(viewModel.title)
@@ -247,100 +239,6 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
-    private fun showEventNotification(
-        context: Context, cid: String, eid: String
-    ) {
-        val notificationId = Random.nextInt(0, 1000)
-
-        // Create a notification channel for Android O and above
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val descriptionText = "Notifications for specific events"
-            val importance = viewModel.selectedImportance
-            val channel = NotificationChannel(
-                CHANNEL_ID, CHANNEL_NAME, importance
-            ).apply {
-                description = descriptionText
-            }
-            // Register the channel with the system
-            val notificationManager: NotificationManager =
-                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-        }
-
-        val alarmSound: Uri =
-            RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-
-        // Intent for the "View" action button
-        val viewIntent =
-            Intent(context, UserMeetingEditorActivity::class.java).apply {
-                putExtra(
-                    UserMeetingEditorActivity.INTENT_EXTRA_CALENDAR_ID, cid
-                )
-                putExtra(UserMeetingEditorActivity.INTENT_EXTRA_EVENT_ID, eid)
-            }
-
-        val pendingIntent: PendingIntent = PendingIntent.getActivity(
-            context,
-            0,
-            viewIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        val title = binding.etTitle.text.toString()
-        val content = binding.etContent.text.toString()
-        val category = viewModel.selectedCategory
-        val priority = viewModel.selectedPriority
-        val badgeIconType = viewModel.selectedBadgeIconType
-        val isAutoCancelEnabled = viewModel.autoCancel
-
-        NotificationCompat.CATEGORY_EVENT
-        val builder = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_notification)
-            .setVibrate(longArrayOf(0, 100)).setSound(alarmSound)
-            .setStyle(NotificationCompat.InboxStyle())
-            .setDefaults(Notification.DEFAULT_SOUND).setCategory(category)
-            .setContentTitle(title).setContentText(content)
-            .setFullScreenIntent(pendingIntent, true)
-            .setContentIntent(pendingIntent)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setPriority(priority).setNumber(0).setBadgeIconType(badgeIconType)
-            .setAutoCancel(isAutoCancelEnabled)
-
-        if(viewModel.action1.isNotEmpty()) {
-            addActionButton(builder, viewModel.action1)
-        }
-        if(viewModel.action2.isNotEmpty()) {
-            addActionButton(builder, viewModel.action2)
-        }
-
-        // Show the notification
-        with(NotificationManagerCompat.from(context)) {
-            if (ActivityCompat.checkSelfPermission(
-                    context, Manifest.permission.POST_NOTIFICATIONS
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                // Permission handling omitted for brevity
-                return
-            }
-            notify(notificationId, builder.build())
-        }
-    }
-
-    private fun addActionButton(builder: NotificationCompat.Builder, action: String) {
-        val actionIntent = Intent(this, UserMeetingEditorActivity::class.java)
-        actionIntent.putExtra(UserMeetingEditorActivity.INTENT_EXTRA_ACTION_BUTTON_TEXT, action)
-        // 指定 FLAG_IMMUTABLE 标志
-        val pendingIntent = PendingIntent.getActivity(
-            this, action.hashCode(), actionIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        val actionButton = NotificationCompat.Action.Builder(
-            0, action, pendingIntent
-        ).build()
-        builder.addAction(actionButton)
-    }
-
-
-
     override fun onResume() {
         super.onResume()
 
@@ -370,10 +268,7 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == REQUEST_CODE_POST_NOTIFICATIONS) {
             // Check if the request was granted or not
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                // Permission was granted. Show the notification again.
-                showEventNotification(
-                    context = applicationContext, "cid xxx", "eid xxx"
-                ) // You might need to adjust this call according to your actual function and context management
+
             } else {
                 // Permission was denied. Handle the failure to have permission.
                 Toast.makeText(
