@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity() {
         observeViewModel()
     }
 
-    private fun startCountdownTimer(delayInSeconds: Long) {
+    private fun startCountdownTimer(delayInSeconds: Long, onFinishCallback: () -> Unit) {
         val timer = object : CountDownTimer(delayInSeconds * 1000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 // 更新 UI 以显示剩余时间，例如更新一个 TextView。这是可选的。
@@ -85,10 +85,8 @@ class MainActivity : AppCompatActivity() {
 
             override fun onFinish() {
                 // 倒计时结束时调用
-                showEventNotification(
-                    this@MainActivity, "calendar_id", "event_id"
-                )
                 binding.tvNotificationCountDown.isGone = true
+                onFinishCallback()
             }
         }
         timer.start()
@@ -97,13 +95,17 @@ class MainActivity : AppCompatActivity() {
     private fun setupUI() {
         // Setup the UI components
         binding.btnShowNotification.setOnClickListener {
+            // Step 1: Update ViewModel state immediately
             viewModel.setUnreadMsgCount(binding.etUnreadMsgCount.text.toString())
+            viewModel.savePreferences(this)
 
             val delayTime =
                 binding.etDelayTime.text.toString().toIntOrNull() ?: 0
-            startCountdownTimer(delayTime.toLong())
-
-            viewModel.savePreferences(this)
+            
+            startCountdownTimer(delayTime.toLong()) {
+                // Step 2: onFinish callback, just show the notification
+                showEventNotification(this, "calendar_id", "event_id")
+            }
         }
 
         binding.switchUseFixedNotificationId.isChecked =
@@ -261,8 +263,8 @@ class MainActivity : AppCompatActivity() {
                 ).show()
             } else {
                 // Solution 1
-//                setSamsungBadgeCount(this, unreadMsgCount)
-//                return@setOnClickListener
+                setSamsungBadgeCount(this, unreadMsgCount)
+                return@setOnClickListener
 
                 // Solution 2: Using NotificationBadge library
                 val success = NotificationBadge(this).applyCount(unreadMsgCount)
@@ -286,19 +288,10 @@ class MainActivity : AppCompatActivity() {
         Log.i(TAG, "setSamsungBadgeCount badgeCount=$badgeCount")
         val intent = Intent("android.intent.action.BADGE_COUNT_UPDATE")
         intent.putExtra("badge_count", badgeCount)
-        intent.putExtra("badge_count_package_name", context.packageName)
-        intent.putExtra("badge_count_class_name", getLauncherClassName(context))
+        val launcherComponent = context.packageManager?.getLaunchIntentForPackage(context.packageName)?.component
+        intent.putExtra("badge_count_package_name", launcherComponent?.packageName)
+        intent.putExtra("badge_count_class_name", launcherComponent?.className)
         context.sendBroadcast(intent)
-    }
-
-    private fun getLauncherClassName(context: Context): String? {
-        val intent = Intent(Intent.ACTION_MAIN).apply {
-            addCategory(Intent.CATEGORY_LAUNCHER)
-        }
-        val resolveInfo = context.packageManager.resolveActivity(
-            intent, PackageManager.MATCH_DEFAULT_ONLY
-        )
-        return resolveInfo?.activityInfo?.name
     }
 
     override fun onResume() {
@@ -411,9 +404,11 @@ class MainActivity : AppCompatActivity() {
             .setPriority(priority).setNumber(0).setBadgeIconType(badgeIconType)
             .setAutoCancel(isAutoCancelEnabled)
 
-        if (viewModel.unreadMsgCount > 0) {
-            // 在通知中顯示數字
+        // Step 3: Centralized badge logic right before showing the notification
+        if(viewModel.unreadMsgCount > 0) {
             builder.setNumber(viewModel.unreadMsgCount)
+            // Also call NotificationBadge for better compatibility
+            NotificationBadge(context).applyCount(viewModel.unreadMsgCount)
         }
 
         if (viewModel.action1.isNotEmpty()) {

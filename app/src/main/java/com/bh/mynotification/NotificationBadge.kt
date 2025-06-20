@@ -369,7 +369,7 @@ class NotificationBadge(context: Context) {
                 if (defaultBadger == null) {
                     defaultBadger = DefaultBadger()
                 }
-                success = defaultBadger?.executeBadge(badgeCount) ?: false
+                success = defaultBadger?.executeBadge(badgeCount) == true
             } catch (ignore: Exception) {
                 Log.w(
                     "SamsungHomeBadger",
