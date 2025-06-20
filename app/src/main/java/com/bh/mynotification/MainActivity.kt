@@ -291,6 +291,7 @@ class MainActivity : AppCompatActivity() {
         val launcherComponent = context.packageManager?.getLaunchIntentForPackage(context.packageName)?.component
         intent.putExtra("badge_count_package_name", launcherComponent?.packageName)
         intent.putExtra("badge_count_class_name", launcherComponent?.className)
+        Log.d( TAG, "setSamsungBadgeCount packageName=${launcherComponent?.packageName}, className=${launcherComponent?.className}")
         context.sendBroadcast(intent)
     }
 
