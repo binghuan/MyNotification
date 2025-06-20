@@ -1,6 +1,6 @@
 # MyNotification
 
-![](./README/illustration.png)
+![](./icon-256.png)
 
 ## Overview
 MyNotification is an Android project designed to be a comprehensive tool for testing and demonstrating the capabilities of the Android Notification system. It allows developers to customize and trigger various types of notifications to see how they behave on different devices and Android versions.
@@ -45,3 +45,5 @@ MyNotification is an Android project designed to be a comprehensive tool for tes
 2. Adjust the various settings in the UI to configure the notification.
 3. Click the **"Show"** button to trigger the notification with the specified delay.
 4. Use the **"setBadge"** feature to test the app icon badge functionality on your device's launcher.
+
+![](./README/illustration.png)
