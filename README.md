@@ -1,18 +1,33 @@
 # MyNotification
 
-![](./README/demo.png)
+![](./README/illustration.png)
 
 ## Overview
-MyNotification is an Android project designed to demonstrate how to implement and customize notifications in an Android application. It provides examples of basic notifications, action buttons, and custom layouts.
+MyNotification is an Android project designed to be a comprehensive tool for testing and demonstrating the capabilities of the Android Notification system. It allows developers to customize and trigger various types of notifications to see how they behave on different devices and Android versions.
 
 ## Features
-- Basic notifications
-- Notifications with action buttons
-- Custom notification layouts
-- Notification channels for Android 8.0+ (Oreo)
+- **Full Notification Customization**:
+  - Set custom title and content.
+  - Adjust notification **Importance** (`NotificationManager.IMPORTANCE_*`).
+  - Assign a **Category** (e.g., `CATEGORY_EVENT`, `CATEGORY_MESSAGE`).
+  - Set **Priority** for older Android versions.
+  - Configure **Badge Icon Type**.
+- **Delayed Notifications**: Schedule a notification to appear after a specified delay, with a visible countdown timer on the screen.
+- **Action Buttons**: Add up to two custom action buttons to the notification.
+- **App Icon Badge Count**:
+  - Set a specific number for the app icon's badge.
+  - Includes a compatibility library (`NotificationBadge`) to support various launchers (Samsung, Sony, Xiaomi, etc.).
+  - Provides UI feedback on whether setting the badge was successful.
+- **Notification ID Control**:
+  - Switch between a fixed notification ID (for updating existing notifications) and a random ID (for creating new ones).
+- **UI & State Management**:
+  - All settings are saved and restored on app launch using `SharedPreferences`.
+  - The UI is built with `ViewBinding` and utilizes a `ScrollView` to fit all options on screen.
+  - A `ViewModel` is used to manage UI state and business logic.
+  - Displays the current notification permission status (both app-level and channel-level).
 
 ## Prerequisites
-- Android Studio installed
+- Android Studio (latest version recommended)
 - Minimum SDK version: 21 (Android 5.0 Lollipop)
 - Target SDK version: 33 (Android 13)
 
@@ -27,5 +42,6 @@ MyNotification is an Android project designed to demonstrate how to implement an
 
 ## Usage
 1. Launch the app on your Android device.
-2. Use the provided UI to trigger different types of notifications.
-3. Customize the notification content and behavior in the source code as needed.
+2. Adjust the various settings in the UI to configure the notification.
+3. Click the **"Show"** button to trigger the notification with the specified delay.
+4. Use the **"setBadge"** feature to test the app icon badge functionality on your device's launcher.
