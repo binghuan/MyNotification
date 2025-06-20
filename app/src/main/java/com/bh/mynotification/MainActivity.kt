@@ -261,8 +261,8 @@ class MainActivity : AppCompatActivity() {
                 ).show()
             } else {
                 // Solution 1
-//                setSamsungBadgeCount(this, unreadMsgCount)
-//                return@setOnClickListener
+                setSamsungBadgeCount(this, unreadMsgCount)
+                return@setOnClickListener
 
                 // Solution 2: Using NotificationBadge library
                 val success = NotificationBadge(this).applyCount(unreadMsgCount)
